@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Navigation from "@/components/ui/navigation-menu"; 
+import Navigation from "@/components/ui/navigation-menu";
 import Footer from "@/components/footer";
 import { Mail, Twitter, Terminal, TrendingUp, Activity, Zap, PieChart } from "lucide-react";
 
@@ -88,15 +88,15 @@ export default function Home() {
 
           {/* CTAs */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-         <Link href="/terminal">
-  <Button 
-    size="lg" 
-    className="bg-black/80 hover:bg-black/60 text-white border-2 border-white/20 hover:border-white/40 transition-all duration-300 px-8 py-3"
-  >
-    <Terminal className="mr-2 h-5 w-5" />
-    Enter Terminal
-  </Button>
-</Link>
+            <Link href="/terminal">
+              <Button
+                size="lg"
+                className="bg-black/80 hover:bg-black/60 text-white border-2 border-white/20 hover:border-white/40 px-8 py-3"
+              >
+                <Terminal className="mr-2 h-5 w-5" />
+                Enter Terminal
+              </Button>
+            </Link>
 
             <Button
               size="lg"
