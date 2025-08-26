@@ -1,33 +1,25 @@
-import * as React from "react"
+"use client";
 
-type Toast = {
-  id: string
-  title?: string
-  description?: string
-  action?: React.ReactNode
-}
+import * as React from "react";
+import * as ToastPrimitives from "@radix-ui/react-toast";
 
-const ToastContext = React.createContext<{
-  toasts: Toast[]
-  addToast: (toast: Omit<Toast, "id">) => void
-} | null>(null)
+// tiny class combiner so we don't depend on "@/lib/utils"
+const cx = (...c: Array<string | undefined | false>) =>
+  c.filter(Boolean).join(" ");
 
-export function ToastProvider({ children }: { children: React.ReactNode }) {
-  const [toasts, setToasts] = React.useState<Toast[]>([])
+export const ToastProvider = ToastPrimitives.Provider;
 
-  const addToast = (toast: Omit<Toast, "id">) => {
-    setToasts([...toasts, { ...toast, id: Math.random().toString() }])
-  }
-
+// Minimal viewport — no external hooks required
+export function ToastViewport(
+  props: React.ComponentProps<typeof ToastPrimitives.Viewport>
+) {
   return (
-    <ToastContext.Provider value={{ toasts, addToast }}>
-      {children}
-    </ToastContext.Provider>
-  )
-}
-
-export function useToast() {
-  const context = React.useContext(ToastContext)
-  if (!context) throw new Error("useToast must be used within ToastProvider")
-  return context
+    <ToastPrimitives.Viewport
+      {...props}
+      className={cx(
+        "fixed bottom-4 right-4 z-[100]",
+        "w-96 max-w-[100vw] outline-none"
+      )}
+    />
+  );
 }
