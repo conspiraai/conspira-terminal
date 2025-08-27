@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
-  base: "/conspira-terminal/", // ✅ required for GitHub Pages
+  base: "/", // ✅ works on Vercel
   plugins: [react()],
   resolve: {
     alias: {
