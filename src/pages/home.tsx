@@ -4,45 +4,56 @@ import { Link } from "wouter";
 
 export default function Home() {
   return (
-    <main className="min-h-[80vh] flex items-center justify-center px-6">
-      <div className="max-w-xl w-full text-center">
-        <h1 className="text-4xl sm:text-5xl font-terminal tracking-wide mb-4">
+    <main className="min-h-[90vh] flex items-center justify-center px-6 bg-[color:var(--bg)] text-[color:var(--text-primary)]">
+      <div className="w-full max-w-2xl text-center">
+        {/* LOGO / TITLE */}
+        <h1 className="text-4xl sm:text-5xl font-terminal tracking-wide mb-3">
           CONSPIRA AI
         </h1>
-
-        <p className="text-[15px] text-[color:var(--text-muted)] mb-8">
-          Site is live. Modules are coming online.
+        <p className="text-sm text-[color:var(--text-muted)]">
+          Surveillance Protocol online. Modules initiating.
         </p>
 
-        <div className="flex items-center justify-center gap-3">
-          {/* Follow on X */}
+        {/* ACTIONS */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {/* Follow on X — your exact handle */}
           <a
-            href="https://x.com/conspira_ai"
+            href="https://twitter.com/conspira_ai"
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-center gap-2 rounded-[10px] border px-4 py-2
-                       hover:glow-accent border-[color:var(--stroke)]
-                       text-[14px] transition"
+            className="pill inline-flex items-center gap-2 rounded-[10px]
+                       border border-[color:var(--stroke)] px-4 py-2
+                       hover:glow-accent transition"
           >
-            <span className="i">Follow on X</span>
+            Follow on X
           </a>
 
-          {/* Enter placeholder (routes to market overview for now) */}
+          {/* Enter */}
           <Link href="/market-overview">
             <a
-              className="inline-flex items-center gap-2 rounded-[10px] border px-4 py-2
-                         border-terminal-purple text-terminal-purple hover:glow-cyan
-                         text-[14px] transition"
+              className="inline-flex items-center gap-2 rounded-[10px]
+                         border px-4 py-2 text-[14px] transition
+                         border-neon-purple text-neon-purple hover:glow-cyan"
             >
-              Enter (placeholder)
+              Enter
             </a>
           </Link>
         </div>
 
-        {/* tiny footer note */}
+        {/* SLIM FOOTER NOTE */}
         <p className="mt-6 text-xs text-[color:var(--text-muted)]">
-          UI is evolving. Some sections are placeholders.
+          Visuals are live. Additional modules will come online progressively.
         </p>
+
+        {/* DECORATIVE LINE / GLOW */}
+        <div
+          className="mt-6 h-px w-full"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(179,0,255,.45), transparent)",
+            boxShadow: "0 0 18px rgba(179,0,255,.25)",
+          }}
+        />
       </div>
     </main>
   );
