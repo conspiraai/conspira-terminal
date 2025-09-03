@@ -1,40 +1,60 @@
+// src/App.tsx
 import React from "react";
 import "./App.css";
 
-function App() {
+export default function App() {
   return (
-    <div>
-      {/* Top Navigation */}
-      <header>
-        <nav>
-          <button className="btn">HOME</button>
-          <button className="btn">MARKET ▾</button>
-          <button className="btn">SOURCES ▾</button>
-        </nav>
+    <>
+      {/* Top Navbar */}
+      <header className="nav">
+        <div className="nav-left">
+          <a className="chip chip-active" href="#">HOME</a>
+
+          <div className="menu">
+            <button className="chip">MARKET ▾</button>
+            {/* (Optional) dropdown items could go here later */}
+          </div>
+        </div>
+
+        <div className="nav-right">
+          <div className="menu">
+            <button className="chip chip-primary">SOURCES ▾</button>
+            {/* (Optional) dropdown items could go here later */}
+          </div>
+        </div>
       </header>
 
-      {/* Hero Section */}
-      <main>
-        <h1>CONSPIRA AI</h1>
-        <p>Uncover the Crypto Undercurrent</p>
+      {/* Hero */}
+      <main className="hero">
+        <h1 className="brand">CONSPIRA AI</h1>
+        <p className="tagline">Uncover the Crypto Undercurrent</p>
 
-        {/* Buttons Row */}
-        <div style={{ textAlign: "center", marginTop: "2rem" }}>
-          <button className="btn">_ Enter Terminal</button>
+        <div className="actions">
+          <a className="btn btn-hollow" href="#" aria-label="Enter Terminal">
+            <span className="caret">▸</span> Enter Terminal
+          </a>
+
           <a
+            className="btn btn-solid"
             href="https://x.com/conspira_ai"
             target="_blank"
-            rel="noopener noreferrer"
-            className="btn"
+            rel="noreferrer"
           >
             Follow on X
           </a>
-          <input type="email" placeholder="Enter email" />
-          <button className="btn">Go</button>
+
+          <div className="email">
+            <input
+              className="input"
+              type="email"
+              placeholder="Enter email"
+              inputMode="email"
+              autoComplete="email"
+            />
+            <button className="btn btn-go">Go</button>
+          </div>
         </div>
       </main>
-    </div>
+    </>
   );
 }
-
-export default App;
