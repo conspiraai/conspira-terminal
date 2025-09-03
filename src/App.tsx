@@ -1,56 +1,70 @@
-// src/App.tsx — minimal, self-contained landing page (no external imports)
-import React from "react";
+// src/App.tsx
+import React, { useState } from "react";
+import "./App.css";
 
 export default function App() {
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0a0b10",
-        color: "#e6e6f0",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        fontFamily: "'JetBrains Mono','Roboto Mono',monospace",
-      }}
-    >
-      <main style={{ width: "100%", maxWidth: 880 }}>
-        <h1 style={{ fontSize: 36, margin: 0, letterSpacing: "0.02em" }}>
-          CONSPIRA AI
-        </h1>
-        <p style={{ opacity: 0.8, marginTop: 10 }}>
-          Site is live. Modules are coming online.
-        </p>
+  const [email, setEmail] = useState("");
 
-        <div style={{ display: "flex", gap: 12, marginTop: 22, flexWrap: "wrap" }}>
+  return (
+    <div className="page">
+      {/* Top pill navbar */}
+      <div className="topbar-wrap">
+        <div className="topbar">
+          <div className="topbar-left">
+            <button className="chip chip-active">HOME</button>
+            <button className="chip">
+              MARKET <span className="caret">▾</span>
+            </button>
+          </div>
+          <div className="spacer" />
+          <button className="chip chip-ghost">
+            SOURCES <span className="caret">▾</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Hero */}
+      <main className="hero">
+        <h1 className="logo-neon">CONSPIRA AI</h1>
+        <p className="tagline">Uncover the Crypto Undercurrent</p>
+
+        {/* Controls row */}
+        <div className="controls">
+          <a className="btn btn-hollow" href="#" onClick={(e) => e.preventDefault()}>
+            <span className="prompt">›_</span> Enter Terminal
+          </a>
+
           <a
-            href="https://x.com/conspiraai"
+            className="btn btn-outline"
+            href="https://x.com/conspira_ai"
             target="_blank"
-            rel="noreferrer"
-            style={{
-              padding: "10px 14px",
-              borderRadius: 10,
-              border: "1px solid #b300ff",
-              textDecoration: "none",
-              color: "#e6e6f0",
-            }}
+            rel="noopener noreferrer"
+            aria-label="Follow Conspira AI on X"
           >
             Follow on X
           </a>
-          <a
-            href="./"
-            style={{
-              padding: "10px 14px",
-              borderRadius: 10,
-              border: "1px solid rgba(255,255,255,.12)",
-              textDecoration: "none",
-              color: "#e6e6f0",
-              opacity: 0.9,
+
+          <form
+            className="notify"
+            onSubmit={(e) => {
+              e.preventDefault();
+              // no backend yet — just a friendly nudge
+              alert("Notified (stub): " + (email || "your email"));
+              setEmail("");
             }}
           >
-            Enter (placeholder)
-          </a>
+            <input
+              className="input"
+              type="email"
+              placeholder="Enter email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <button className="btn btn-pink" type="submit">
+              Go
+            </button>
+          </form>
         </div>
       </main>
     </div>
