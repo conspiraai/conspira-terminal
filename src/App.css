@@ -1,0 +1,174 @@
+/* src/App.css */
+:root{
+  --bg:#0a0a0a;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --panel:#151515;
+  --line:#2a2a2a;
+  --purple:#a855f7;
+  --purple-2:#7c3aed;
+  --pink:#ff3ea5;
+  --white:#ffffff;
+}
+
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}
+
+/* Layout */
+.page{
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* Top pill navbar */
+.topbar-wrap{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  padding-top:28px;
+}
+
+.topbar{
+  width:min(980px, 92vw);
+  background:linear-gradient(to bottom, #121212, #0d0d0d);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  box-shadow:0 0 0 1px rgba(255,255,255,0.02) inset, 0 8px 30px rgba(0,0,0,0.35);
+}
+
+.topbar-left{display:flex;gap:8px}
+.spacer{flex:1}
+
+.chip{
+  font-size:12px;
+  letter-spacing:.06em;
+  padding:6px 10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#0f0f0f;
+  color:var(--muted);
+}
+.chip:hover{border-color:#3a3a3a;color:#c7cad1}
+.chip-active{
+  color:#fff;
+  border-color:rgba(168,85,247,.5);
+  background:rgba(168,85,247,.08);
+  box-shadow:0 0 12px rgba(168,85,247,.25) inset;
+}
+.chip-ghost{background:transparent}
+.caret{opacity:.7;margin-left:6px}
+
+/* Hero */
+.hero{
+  width:100%;
+  max-width:980px;
+  margin:80px auto 40px;
+  text-align:center;
+  padding:0 20px;
+}
+
+.logo-neon{
+  margin:0;
+  font-size: clamp(40px, 9vw, 96px);
+  font-weight: 800;
+  letter-spacing:.06em;
+  color: var(--pink);
+  text-shadow:
+    0 0 12px rgba(255,62,165,.65),
+    0 0 36px rgba(255,62,165,.35),
+    0 0 72px rgba(255,62,165,.18);
+}
+
+.tagline{
+  margin:14px 0 34px;
+  color: var(--muted);
+  font-size:14px;
+  letter-spacing:.04em;
+}
+
+/* Controls row */
+.controls{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:12px;
+}
+
+/* Buttons */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 16px;
+  border-radius:8px;
+  font-weight:700;
+  text-decoration:none;
+  cursor:pointer;
+  transition:transform .07s ease, box-shadow .2s ease, border-color .2s ease, color .2s ease;
+  user-select:none;
+}
+.btn:active{transform:translateY(1px)}
+
+.btn-hollow{
+  color:#cbd5e1;
+  border:1px dashed #3b3b3b;
+  background:transparent;
+}
+.btn-hollow:hover{border-color:#525252;color:#e5e7eb}
+.prompt{color:#9ca3af}
+
+.btn-outline{
+  color:var(--purple);
+  border:1px solid rgba(168,85,247,.6);
+  background:rgba(168,85,247,.06);
+  box-shadow:0 0 10px rgba(168,85,247,.25) inset;
+}
+.btn-outline:hover{
+  color:#fff;
+  border-color:var(--purple);
+  box-shadow:0 0 18px rgba(168,85,247,.35) inset, 0 0 22px rgba(168,85,247,.15);
+}
+
+.btn-pink{
+  color:#0a0a0a;
+  background:var(--pink);
+  border:1px solid #ff6cc2;
+  box-shadow:0 6px 18px rgba(255,62,165,.25);
+}
+.btn-pink:hover{
+  filter:saturate(1.05) brightness(1.02);
+  box-shadow:0 10px 26px rgba(255,62,165,.35);
+}
+
+/* Notify form */
+.notify{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel);
+}
+.input{
+  width:180px;
+  height:36px;
+  padding:0 10px;
+  border:1px solid #222;
+  border-radius:6px;
+  background:#0e0e0e;
+  color:var(--text);
+  outline:none;
+}
+.input::placeholder{color:#6b7280}
+.input:focus{border-color:#3a3a3a}
+@media (max-width:480px){
+  .input{width:140px}
+}
