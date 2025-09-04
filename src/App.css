@@ -213,6 +213,7 @@ body{
   .actions{flex-direction:column; align-items:stretch}
   .waitlist{width:100%}
 }
+
 .statusbar {
   margin: 18px auto 8px;
   max-width: 880px;
@@ -233,9 +234,9 @@ body{
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: #22e65e;
-  box-shadow: 0 0 6px #22e65e, 0 0 12px rgba(34,230,94,0.6);
-  animation: pulse 2s infinite; /* <- run the animation */
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e, 0 0 12px rgba(34,197,94,0.6);
+  animation: pulse 2s infinite;
 }
 
 .status-sep {
@@ -243,7 +244,6 @@ body{
   padding: 0 4px;
 }
 
-/* one (and only one) keyframes block */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
