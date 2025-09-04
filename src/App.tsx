@@ -1,59 +1,39 @@
-// src/App.tsx
-import React from "react";
-import "./App.css";
-
 export default function App() {
   return (
     <>
-      {/* Top Navbar */}
-      <header className="nav">
-        <div className="nav-left">
-          <a className="chip chip-active" href="#">HOME</a>
-
-          <div className="menu">
-            <button className="chip">MARKET ▾</button>
-            {/* (Optional) dropdown items could go here later */}
+      <header className="header">
+        <nav className="nav">
+          <div className="left">
+            <a className="btn" href="/">HOME</a>
+            <button className="btn" type="button" disabled>MARKET ▾</button>
           </div>
-        </div>
-
-        <div className="nav-right">
-          <div className="menu">
-            <button className="chip chip-primary">SOURCES ▾</button>
-            {/* (Optional) dropdown items could go here later */}
+          <div className="right">
+            <button className="btn" type="button" disabled>SOURCES ▾</button>
           </div>
-        </div>
+        </nav>
       </header>
 
-      {/* Hero */}
-      <main className="hero">
+      <main className="main">
         <h1 className="brand">CONSPIRA AI</h1>
         <p className="tagline">Uncover the Crypto Undercurrent</p>
 
-        <div className="actions">
-          <a className="btn btn-hollow" href="#" aria-label="Enter Terminal">
-            <span className="caret">▸</span> Enter Terminal
-          </a>
+        <div className="ctaRow">
+          <a className="btn" href="#" aria-disabled="true">›_ Enter Terminal</a>
 
           <a
-            className="btn btn-solid"
+            className="btn btn--accent"
             href="https://x.com/conspira_ai"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
           >
             Follow on X
           </a>
 
-          <div className="email">
-            <input
-              className="input"
-              type="email"
-              placeholder="Enter email"
-              inputMode="email"
-              autoComplete="email"
-            />
-            <button className="btn btn-go">Go</button>
-          </div>
+          <input className="input" placeholder="Enter email" />
+          <button className="go go--accent" type="button">Go</button>
         </div>
+
+        <p className="footer">Site is live. Modules are coming online.</p>
       </main>
     </>
   );
