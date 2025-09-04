@@ -239,16 +239,22 @@ const statusBar: React.CSSProperties = {
   backdropFilter: "blur(8px)",
   color: "#e5e7eb",
   fontWeight: 500,
+  boxShadow: "0 0 12px rgba(229,126,235,0.6), 0 0 24px rgba(229,126,235,0.3)", // neon glow
 };
 
 const statusDot: React.CSSProperties = {
   width: 8,
   height: 8,
   borderRadius: 999,
-  background:
-    "radial-gradient(circle at 30% 30%, #40ff9d, #1ed46d 60%, #0a9c4d 100%)",
-  boxShadow: "0 0 10px #40ff9d, 0 0 18px #1ed46d",
+  background: "#22c55e",
+  boxShadow: "0 0 6px #22c55e, 0 0 12px #22c55e",
+  animation: "pulse 2s infinite",
 };
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.2); }
+}
 
 const statusSep: React.CSSProperties = { opacity: 0.7 };
 
