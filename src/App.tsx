@@ -84,7 +84,12 @@ export default function App() {
         <p style={tagline}>
           Real-time market pull signals. Curated. Fast. Coming online soon.
         </p>
-
+<div className="statusbar">
+  <span className="status-dot"></span>
+  <strong>System Status</strong>
+  <span className="status-sep">•</span>
+  First scanners online. More modules launching soon.
+</div>
         <div style={ctaRow}>
           <button style={btnPrimary} onClick={() => setOpen(true)}>
             Get Early Access
