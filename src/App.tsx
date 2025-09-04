@@ -95,7 +95,7 @@ function StatusBarRotating() {
         setVisible(true); // fade in
       }, 280); // match transition below
       return () => clearTimeout(t);
-    }, 3000);
+    }, 6000);
     return () => clearInterval(cycle);
   }, []);
 
@@ -108,7 +108,7 @@ function StatusBarRotating() {
         style={{
           ...statusText,
           opacity: visible ? 1 : 0,
-          transition: "opacity 280ms ease",
+          transition: "opacity 500ms ease",
         }}
       >
         {messages[idx]}
@@ -231,15 +231,14 @@ const tagline: React.CSSProperties = {
 const statusBar: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
-  gap: 8,
+  gap: 6,
   fontSize: 13,
-  maxWidth: 880,
-  padding: "10px 14px",
-  borderRadius: 8,
-  background: "rgba(255,255,255,0.06)",
+  padding: "6px 12px",
+  borderRadius: 20,
+  background: "rgba(0,0,0,0.3)",
   backdropFilter: "blur(8px)",
-  boxShadow: "0 0 0 1px rgba(255,255,255,0.05) inset",
-  color: "#cfd2ff",
+  color: "#e5e7eb",
+  fontWeight: 500,
 };
 
 const statusDot: React.CSSProperties = {
