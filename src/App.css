@@ -213,3 +213,31 @@ body{
   .actions{flex-direction:column; align-items:stretch}
   .waitlist{width:100%}
 }
+.statusbar {
+  margin: 18px auto 8px;
+  max-width: 880px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.25;
+  color: #e0e0e0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  backdrop-filter: blur(8px);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00ff95;
+  box-shadow: 0 0 6px #00ff95;
+}
+
+.status-sep {
+  opacity: 0.6;
+  padding: 0 4px;
+}
