@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 /** Replace this later with your real Telegram channel link */
-const TELEGRAM_URL = "#";
+const TELEGRAM_URL = "https://t.me/ConspiraAINetwork";
 const X_HANDLE_URL = "https://x.com/conspira_ai";
 
 function WaitlistModal({ open, onClose }: { open: boolean; onClose: () => void }) {
