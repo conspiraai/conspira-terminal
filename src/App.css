@@ -232,16 +232,25 @@ body{
 .status-dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: #00ff95;
-  box-shadow: 0 0 6px #00ff95;
+  border-radius: 999px;
+  background: #22e65e;
+  box-shadow: 0 0 6px #22e65e, 0 0 12px rgba(34,230,94,0.6);
+  animation: pulse 2s infinite; /* <- run the animation */
 }
 
 .status-sep {
   opacity: 0.6;
   padding: 0 4px;
 }
+
+/* one (and only one) keyframes block */
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.2); }
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
 }
