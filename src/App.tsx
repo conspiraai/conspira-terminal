@@ -1,322 +1,272 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 
-/** ---------- Helpers ---------- */
-type CGRow = {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number;
-  market_cap_rank: number | null;
-  total_volume: number; // 24h volume
-  price_change_percentage_1h_in_currency?: number | null;
-  price_change_percentage_24h_in_currency?: number | null;
-  price_change_percentage_7d_in_currency?: number | null;
-};
+/** Replace this later with your real Telegram channel link */
+const TELEGRAM_URL = "#";
+const X_HANDLE_URL = "https://x.com/conspira_ai";
 
-function money(n: number) {
-  if (n >= 1_000_000_000) return `$${(n / 1_000_000_000).toFixed(2)}B`;
-  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
-  if (n >= 1_000) return `$${(n / 1_000).toFixed(1)}k`;
-  return `$${n.toFixed(4)}`;
-}
-
-function pct(n?: number | null, digits = 2) {
-  if (n == null) return "—";
-  const s = n > 0 ? "+" : "";
-  return `${s}${n.toFixed(digits)}%`;
-}
-
-/** Score: simple & sellable.
- * We value near-term acceleration but still care about 7d follow-through.
- * Clamp to 0–10 for a clean, producty feel.
- */
-function signalScore(spike1h: number, momentum7d: number) {
-  const raw = 0.7 * Math.max(0, spike1h) + 0.3 * Math.max(0, momentum7d);
-  const scaled = Math.min(10, Math.max(0, raw / 3)); // tame big %s into 0–10
-  return Number(scaled.toFixed(2));
-}
-
-/** ---------- Component ---------- */
-export default function App() {
-  const [rows, setRows] = useState<CGRow[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+function WaitlistModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const url =
-          "https://api.coingecko.com/api/v3/coins/markets" +
-          "?vs_currency=usd&order=market_cap_desc&per_page=120&page=1" +
-          "&price_change_percentage=1h,24h,7d";
-        const res = await fetch(url, { headers: { accept: "application/json" } });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data: CGRow[] = await res.json();
-        if (!cancelled) setRows(data);
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || "Failed to load market data.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Select 1 featured + 3 runner-ups, with simple guardrails to avoid junk.
-  const picks = useMemo(() => {
-    if (!rows) return null;
-    const filtered = rows
-      .filter(r =>
-        (r.total_volume ?? 0) >= 100_000 && // avoid illiquid noise
-        r.current_price > 0 &&
-        r.price_change_percentage_1h_in_currency != null &&
-        r.price_change_percentage_7d_in_currency != null
-      )
-      .map(r => {
-        const s = signalScore(
-          r.price_change_percentage_1h_in_currency || 0,
-          r.price_change_percentage_7d_in_currency || 0
-        );
-        return { ...r, _signal: s };
-      })
-      .sort((a, b) => (b as any)._signal - (a as any)._signal);
-
-    const top = filtered.slice(0, 4);
-    if (!top.length) return { featured: null as any, runners: [] as CGRow[] };
-    return { featured: top[0], runners: top.slice(1) as any[] };
-  }, [rows]);
+  if (!open) return null;
 
   return (
-    <div style={styles.wrap}>
-      {/* Top bar (simple) */}
-      <div style={styles.topbar}>
-        <a href="/" style={styles.badge}>HOME</a>
-        <div style={{ flex: 1 }} />
-        <a
-          href="https://x.com/conspira_ai"
-          target="_blank"
-          rel="noreferrer"
-          style={styles.follow}
-        >
-          Follow on X
-        </a>
-      </div>
-
-      {/* Hero */}
-      <header style={styles.hero}>
-        <h1 style={styles.title}>CONSPIRA AI</h1>
-        <p style={styles.tagline}>Uncover the Crypto Undercurrent</p>
-
-        <div style={styles.ctaRow}>
-          <a href="#terminal" style={styles.btnGhost}>_ Enter Terminal</a>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert(`Added to waitlist: ${email || "(email missing)"}`);
-              setEmail("");
-            }}
-            style={styles.waitlist}
-          >
-            <input
-              placeholder="Join the waitlist (email)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              style={styles.input}
-            />
-            <button style={styles.btnPrimary}>Go</button>
-          </form>
-        </div>
-      </header>
-
-      {/* Signal section */}
-      <section style={styles.section}>
-        <div style={styles.sectionHead}>
-          <div style={styles.kicker}>Live Signal</div>
-          <div style={styles.formula}>Score = 0.7×Spike (1h) + 0.3×Momentum (7d)</div>
-        </div>
-
-        {loading && <div style={styles.note}>Scanning markets…</div>}
-        {error && <div style={styles.error}>Error: {error}</div>}
-
-        {picks && picks.featured && (
+    <div style={backdrop} onClick={onClose}>
+      <div style={modal} onClick={(e) => e.stopPropagation()}>
+        {!done ? (
           <>
-            <FeaturedCard row={picks.featured as any} />
-            {picks.runners.length > 0 && (
-              <div style={styles.runners}>
-                {picks.runners.map((r) => (
-                  <RunnerPill key={r.id} row={r as any} />
-                ))}
-              </div>
-            )}
-            <div style={styles.disclaimer}>
-              Data via CoinGecko. Rankings refresh on page load.
+            <h2 style={modalTitle}>Get Early Access</h2>
+            <p style={modalText}>
+              Be first to try the Conspira AI Terminal. We’ll notify you as modules go live.
+            </p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                style={modalInput}
+                type="email"
+                placeholder="you@domain.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <button
+                style={modalCTA}
+                onClick={() => {
+                  if (!email || !email.includes("@")) return;
+                  setDone(true);
+                }}
+              >
+                Join
+              </button>
             </div>
+            <div style={modalFineprint}>
+              Prefer chat?{" "}
+              <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" style={modalLink}>
+                Join our Telegram
+              </a>
+              .
+            </div>
+            <button style={modalGhost} onClick={onClose}>Close</button>
+          </>
+        ) : (
+          <>
+            <h2 style={modalTitle}>You’re on the list</h2>
+            <p style={modalText}>Follow us on X for drops and updates.</p>
+            <a href={X_HANDLE_URL} target="_blank" rel="noreferrer" style={modalCTA as any}>
+              Follow on X
+            </a>
           </>
         )}
+      </div>
+    </div>
+  );
+}
 
-        {picks && !picks.featured && !loading && !error && (
-          <div style={styles.note}>No qualifying symbols right now. Check back soon.</div>
-        )}
+export default function App() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div style={page}>
+      {/* Top bar */}
+      <header style={topbar}>
+        <a href="/" style={brand}>CONSPIRA AI</a>
+        <nav style={{ display: "flex", gap: 10 }}>
+          <a href={X_HANDLE_URL} target="_blank" rel="noreferrer" style={follow}>
+            Follow on X
+          </a>
+          <a href={TELEGRAM_URL} target="_blank" rel="noreferrer" style={follow}>
+            Telegram
+          </a>
+        </nav>
+      </header>
+
+      {/* Hero */}
+      <section style={hero}>
+        <h1 style={headline}>Uncover the Crypto Undercurrent</h1>
+        <p style={tagline}>
+          Real-time market pull signals. Curated. Fast. Coming online soon.
+        </p>
+
+        <div style={ctaRow}>
+          <button style={btnPrimary} onClick={() => setOpen(true)}>
+            Get Early Access
+          </button>
+          <a href="#" style={btnGhost}>_ Enter Terminal</a>
+        </div>
       </section>
 
-      <footer style={styles.footer}>© {new Date().getFullYear()} Conspira AI</footer>
-    </div>
-  );
-}
-
-/** ---------- UI bits ---------- */
-function FeaturedCard({ row }: { row: CGRow & { _signal: number } }) {
-  return (
-    <div style={styles.card}>
-      <div style={styles.cardLeft}>
-        <img src={row.image} alt={row.symbol} style={styles.logo} />
-        <div>
-          <div style={styles.nameRow}>
-            <span style={styles.name}>{row.name}</span>
-            <span style={styles.ticker}>{row.symbol.toUpperCase()}</span>
+      {/* Coming Soon feature */}
+      <section style={section}>
+        <div style={card}>
+          <div>
+            <div style={kicker}>Coming Soon</div>
+            <h3 style={cardTitle}>Market Pull Signal</h3>
+            <p style={cardText}>
+              A single daily “Signal of the Day,” plus runner-ups. Based on near-term acceleration
+              and 7-day follow-through — simple 0–10 score you can act on.
+            </p>
           </div>
-          <div style={styles.price}>{money(row.current_price)}</div>
-          <div style={styles.meta}>
-            Vol (24h): <b>{money(row.total_volume)}</b> · Rank:{" "}
-            <b>{row.market_cap_rank ?? "—"}</b>
+          <div style={cardCTAWrap}>
+            <button style={btnPrimarySm} onClick={() => setOpen(true)}>Join Waitlist</button>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div style={styles.metrics}>
-        <Metric label="Spike (1h)" value={pct(row.price_change_percentage_1h_in_currency)} />
-        <Metric label="Shift (24h)" value={pct(row.price_change_percentage_24h_in_currency)} />
-        <Metric label="Momentum (7d)" value={pct(row.price_change_percentage_7d_in_currency)} />
-        <div style={styles.scoreBox}>
-          <div style={styles.scoreLabel}>Signal</div>
-          <div style={styles.scoreValue}>{(row as any)._signal.toFixed(2)}</div>
-        </div>
-      </div>
+      <footer style={footer}>© {new Date().getFullYear()} Conspira AI</footer>
 
-      <div style={styles.cardCTA}>
-        <a href="#terminal" style={styles.btnPrimaryWide}>Analyze in Terminal</a>
-      </div>
+      <WaitlistModal open={open} onClose={() => setOpen(false)} />
     </div>
   );
 }
 
-function RunnerPill({ row }: { row: CGRow & { _signal: number } }) {
-  return (
-    <div style={styles.pill}>
-      <img src={row.image} alt={row.symbol} style={styles.pillImg} />
-      <div style={{ marginRight: 8, fontWeight: 600 }}>{row.symbol.toUpperCase()}</div>
-      <div style={styles.pillScore}>{(row as any)._signal.toFixed(2)}</div>
-    </div>
-  );
-}
-
-function Metric({ label, value }: { label: string; value: string }) {
-  const isNeg = value.startsWith("-"); // crude but fine
-  return (
-    <div style={styles.metric}>
-      <div style={styles.metricLabel}>{label}</div>
-      <div style={{ ...styles.metricValue, color: isNeg ? "#ff616e" : "#7dffa3" }}>{value}</div>
-    </div>
-  );
-}
-
-/** ---------- Styles (inline to keep this drop-in self-contained) ---------- */
-const styles: Record<string, React.CSSProperties> = {
-  wrap: { minHeight: "100vh", background: "linear-gradient(#0d0f14,#0b0d12)", color: "#dfe3ec" },
-  topbar: {
-    height: 56, display: "flex", alignItems: "center", padding: "0 14px",
-    borderBottom: "1px solid rgba(255,255,255,0.06)"
-  },
-  badge: {
-    fontSize: 12, letterSpacing: 1, padding: "6px 10px", borderRadius: 8,
-    border: "1px solid rgba(255,255,255,0.12)", color: "#dfe3ec", textDecoration: "none"
-  },
-  follow: {
-    fontSize: 12, padding: "6px 10px", borderRadius: 8, background: "#12131a",
-    border: "1px solid rgba(255,255,255,0.12)", color: "#dfe3ec", textDecoration: "none"
-  },
-  hero: { textAlign: "center", padding: "48px 16px 8px" },
-  title: {
-    fontSize: "clamp(44px, 9vw, 112px)", margin: 0,
-    fontWeight: 800, letterSpacing: 6, color: "#fff",
-    textShadow: "0 0 32px rgba(255,0,128,0.35), 0 0 64px rgba(255,0,128,0.2)"
-  },
-  tagline: { opacity: 0.8, marginTop: 10 },
-  ctaRow: { marginTop: 24, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" },
-  btnGhost: {
-    padding: "12px 18px", borderRadius: 12, border: "1px dashed rgba(255,255,255,0.25)",
-    background: "transparent", color: "#dfe3ec", textDecoration: "none"
-  },
-  waitlist: { display: "flex", gap: 10 },
-  input: {
-    width: 280, padding: "12px 14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)",
-    background: "#0f1117", color: "#dfe3ec", outline: "none"
-  },
-  btnPrimary: {
-    padding: "12px 16px", borderRadius: 12, border: "none",
-    background: "linear-gradient(90deg,#ff008c,#a64dff)", color: "#fff", fontWeight: 700
-  },
-  section: { maxWidth: 1080, margin: "36px auto 80px", padding: "0 16px" },
-  sectionHead: { display: "flex", alignItems: "baseline", gap: 12, marginBottom: 12 },
-  kicker: { fontSize: 12, letterSpacing: 1, opacity: 0.9 },
-  formula: { fontSize: 12, opacity: 0.6 },
-  note: { opacity: 0.7, padding: "18px 0" },
-  error: { color: "#ff6b7a", padding: "18px 0" },
-
-  card: {
-    borderRadius: 18, border: "1px solid rgba(255,255,255,0.08)",
-    background: "linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0))",
-    padding: 18, display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 16,
-  },
-  cardLeft: { display: "flex", gap: 14, alignItems: "center" },
-  logo: { width: 42, height: 42, borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)" },
-  nameRow: { display: "flex", gap: 8, alignItems: "baseline" },
-  name: { fontSize: 18, fontWeight: 700, color: "#fff" },
-  ticker: { fontSize: 13, opacity: 0.7, letterSpacing: 1.5 },
-  price: { marginTop: 6, fontWeight: 700 },
-  meta: { marginTop: 4, opacity: 0.7, fontSize: 12 },
-
-  metrics: { display: "grid", gridTemplateColumns: "repeat(4, minmax(0,1fr))", gap: 12, alignItems: "center" },
-  metric: { padding: 12, borderRadius: 12, background: "#0f1117", border: "1px solid rgba(255,255,255,0.08)" },
-  metricLabel: { fontSize: 12, opacity: 0.7, marginBottom: 6 },
-  metricValue: { fontSize: 16, fontWeight: 800 },
-
-  scoreBox: {
-    padding: 12, borderRadius: 12, textAlign: "center",
-    background: "linear-gradient(90deg,rgba(255,0,140,0.12),rgba(166,77,255,0.12))",
-    border: "1px solid rgba(255,0,140,0.25)"
-  },
-  scoreLabel: { fontSize: 12, opacity: 0.8, marginBottom: 4 },
-  scoreValue: { fontSize: 22, fontWeight: 900, color: "#fff" },
-
-  cardCTA: { display: "flex", alignItems: "center", justifyContent: "flex-end" },
-  btnPrimaryWide: {
-    padding: "12px 18px", borderRadius: 12, border: "none",
-    background: "linear-gradient(90deg,#ff008c,#a64dff)", color: "#fff", fontWeight: 800,
-    textDecoration: "none", whiteSpace: "nowrap"
-  },
-
-  runners: { display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" },
-  pill: {
-    display: "flex", alignItems: "center", gap: 8, padding: "8px 10px",
-    borderRadius: 999, background: "#101219", border: "1px solid rgba(255,255,255,0.08)"
-  },
-  pillImg: { width: 18, height: 18, borderRadius: 4, border: "1px solid rgba(255,255,255,0.1)" },
-  pillScore: {
-    padding: "2px 8px", borderRadius: 999, fontWeight: 800, fontSize: 12,
-    background: "rgba(255,0,140,0.15)", border: "1px solid rgba(255,0,140,0.3)"
-  },
-
-  disclaimer: { opacity: 0.55, fontSize: 12, marginTop: 10 },
-  footer: { opacity: 0.5, textAlign: "center", padding: "40px 0 30px" },
-
-  // responsive tweak
-  "@media (max-width: 860px)": {}
+/* ---------- inline styles to keep this drop-in self-contained ---------- */
+const page: React.CSSProperties = {
+  minHeight: "100vh",
+  background:
+    "radial-gradient(1200px 600px at 50% -10%, rgba(255,46,166,.12), transparent 60%)," +
+    "radial-gradient(900px 500px at 80% -5%, rgba(139,92,246,.12), transparent 65%)," +
+    "#0b0f15",
+  color: "#e7ecf2",
 };
+
+const topbar: React.CSSProperties = {
+  position: "sticky",
+  top: 0,
+  zIndex: 20,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "12px 16px",
+  background: "rgba(11,15,21,.6)",
+  backdropFilter: "blur(8px)",
+  borderBottom: "1px solid rgba(255,255,255,.06)",
+};
+
+const brand: React.CSSProperties = {
+  textDecoration: "none",
+  fontWeight: 800,
+  letterSpacing: 1,
+  color: "#fff",
+};
+
+const follow: React.CSSProperties = {
+  textDecoration: "none",
+  color: "#cbd5e1",
+  padding: "8px 12px",
+  borderRadius: 10,
+  background: "rgba(26,34,48,.6)",
+  border: "1px solid #2a3442",
+};
+
+const hero: React.CSSProperties = { textAlign: "center", padding: "56px 16px 22px" };
+
+const headline: React.CSSProperties = {
+  margin: 0,
+  fontSize: "clamp(40px, 7vw, 96px)",
+  letterSpacing: 1,
+  color: "#fff",
+  textShadow: "0 0 22px rgba(255,46,166,.35), 0 0 50px rgba(139,92,246,.25)",
+};
+
+const tagline: React.CSSProperties = { marginTop: 12, opacity: 0.8 };
+
+const ctaRow: React.CSSProperties = {
+  marginTop: 22,
+  display: "flex",
+  gap: 12,
+  justifyContent: "center",
+  flexWrap: "wrap",
+};
+
+const btnPrimary: React.CSSProperties = {
+  padding: "12px 18px",
+  borderRadius: 12,
+  border: 0,
+  cursor: "pointer",
+  background: "linear-gradient(90deg,#ff00a8,#a64dff)",
+  color: "#fff",
+  fontWeight: 800,
+  boxShadow: "0 10px 30px rgba(0,0,0,.35)",
+};
+
+const btnGhost: React.CSSProperties = {
+  padding: "12px 18px",
+  borderRadius: 12,
+  border: "1px dashed rgba(255,255,255,.25)",
+  color: "#e7ecf2",
+  textDecoration: "none",
+};
+
+const section: React.CSSProperties = { maxWidth: 1080, margin: "18px auto 64px", padding: "0 16px" };
+
+const card: React.CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "1fr auto",
+  gap: 16,
+  borderRadius: 16,
+  border: "1px solid rgba(255,255,255,.08)",
+  background: "linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01))",
+  padding: 18,
+  boxShadow: "0 10px 30px rgba(0,0,0,.35)",
+};
+
+const kicker: React.CSSProperties = { fontSize: 12, opacity: 0.8, marginBottom: 6, letterSpacing: 1 };
+const cardTitle: React.CSSProperties = { margin: "0 0 6px", fontSize: 22, color: "#fff" };
+const cardText: React.CSSProperties = { margin: 0, color: "#b9c0cf", lineHeight: 1.5 };
+const cardCTAWrap: React.CSSProperties = { display: "flex", alignItems: "center" };
+const btnPrimarySm: React.CSSProperties = { ...btnPrimary, padding: "10px 14px", fontWeight: 700 };
+
+const footer: React.CSSProperties = {
+  textAlign: "center",
+  color: "#92a1b3",
+  padding: "28px 0 18px",
+  borderTop: "1px solid rgba(255,255,255,.06)",
+};
+
+/* Modal styles */
+const backdrop: React.CSSProperties = {
+  position: "fixed",
+  inset: 0,
+  background: "rgba(0,0,0,.6)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 9999,
+};
+const modal: React.CSSProperties = {
+  width: "min(560px, 92vw)",
+  background: "linear-gradient(180deg,#12121a,#0e0e14)",
+  border: "1px solid rgba(255,255,255,.1)",
+  boxShadow: "0 12px 40px rgba(0,0,0,.5)",
+  borderRadius: 14,
+  padding: 24,
+  color: "#e7e7ee",
+};
+const modalTitle: React.CSSProperties = { margin: "0 0 6px", fontSize: 24, letterSpacing: 0.5 };
+const modalText: React.CSSProperties = { margin: "0 0 16px", color: "#b9b9c8", fontSize: 14, lineHeight: 1.5 };
+const modalInput: React.CSSProperties = {
+  flex: 1,
+  padding: "12px 14px",
+  background: "#0a0a12",
+  color: "#e7e7ee",
+  border: "1px solid rgba(255,255,255,.12)",
+  borderRadius: 10,
+  outline: "none",
+};
+const modalCTA: React.CSSProperties = {
+  padding: "12px 16px",
+  borderRadius: 10,
+  border: 0,
+  background: "linear-gradient(90deg,#ff00a8,#ff4d5a)",
+  color: "#fff",
+  fontWeight: 700,
+  cursor: "pointer",
+};
+const modalGhost: React.CSSProperties = {
+  marginTop: 12,
+  background: "transparent",
+  color: "#9aa0a6",
+  border: 0,
+  cursor: "pointer",
+  fontSize: 13,
+};
+const modalFineprint: React.CSSProperties = { marginTop: 10, fontSize: 12, color: "#9aa0a6" };
+const modalLink: React.CSSProperties = { color: "#c6d7ff", textDecoration: "none" };
